@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Acme Grid Maker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="styles.css" />
+  </head>
+  <body>
+    <h1>Acme Grid Maker</h1>
+    <form>
+      <input type="text" id="row-input" class="fullwidth" />
+      <input type="text" id="cell-input" class="fullwidth" />
+      <button class="fullwidth">Make Grid</button>
+    </form>
+    <div id="grid"></div>
+    <div>
+      <span id="row-idx" class="hidden"></span>
+      <span id="cell-idx" class="hidden"></span>
+    </div>
+  </body>
+
+  <script>
+    const btn = document.querySelector('button');
+    const render = (template, node) => {
+      node.innerHTML += template;
+    };
+
+    const selected = evt => {
+      evt.target.classList.add('selected');
+      document.querySelectorAll('.cell').forEach((cell, idx) => {
+        if (cell === evt.target) {
+          document.querySelector('#cell-idx').innerText = `cIdx: ${idx}`;
+        }
+      });
+
+      document.querySelectorAll('.row').forEach((row, idx) => {
+        if (row === evt.target.parentNode) {
+          document.querySelector('#row-idx').innerText = `rIdx: ${idx}`;
+        }
+      });
+
+      evt.stopPropagation();
+    };
+
+    const createGrid = evt => {
+      const rows = document.querySelector('#row-input').value;
+      const columns = document.querySelector('#cell-input').value;
+      document.querySelector('#grid').innerHTML = null;
+
+      if (document.querySelector('#grid').innerHTML === '') {
+        document.querySelectorAll('#row-idx, #cell-idx').forEach(node => {
+          node.classList.add('hidden');
+        });
+      }
+
+      if (
+        (rows === '' || rows === null) ||
+        (columns === '' || columns === null)
+      ) {
+        alert('provide input');
+      } else if (isNaN(rows) || isNaN(columns)) {
+        alert('provide numbers');
+      } else {
+        for (let i = 0; i < rows; i++) {
+          render('<div class="row"></div>', document.querySelector('#grid'));
+          for (let j = 0; j < columns; j++) {
+            render(
+              '<div class="cell"></div>',
+              document.querySelectorAll('.row')[i]
+            );
+          }
+        }
+        document.querySelectorAll('#row-idx, #cell-idx').forEach(node => {
+          node.classList.remove('hidden');
+        });
+      }
+
+      document.querySelectorAll('.cell').forEach(node => {
+        node.addEventListener('click', selected);
+      });
+      evt.preventDefault();
+    };
+
+    btn.addEventListener('click', createGrid);
+  </script>
+</html>
