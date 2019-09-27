@@ -10,12 +10,23 @@
   <body>
     <h1>Acme Grid Maker</h1>
     <form>
-      <input type="text" id="row-input" class="fullwidth" />
-      <input type="text" id="cell-input" class="fullwidth" />
+      <input type="text" id="row-input" class="fullwidth" placeholder="rows" />
+      <span id="row-span-warning" class="input-warning hidden"
+        >rows must be between 1 and 50</span
+      >
+      <input
+        type="text"
+        id="cell-input"
+        class="fullwidth"
+        placeholder="columns"
+      />
+      <span id="column-span-warning" class="input-warning hidden"
+        >columns must be between 1 and 50</span
+      >
       <button class="fullwidth">Make Grid</button>
     </form>
     <div id="grid"></div>
-    <div>
+    <div id="idx-container">
       <span id="row-idx" class="hidden"></span>
       <span id="cell-idx" class="hidden"></span>
     </div>
@@ -45,6 +56,8 @@
     };
 
     const createGrid = evt => {
+      let buildrows = false;
+      let buildcells = false;
       const rows = document.querySelector('#row-input').value;
       const columns = document.querySelector('#cell-input').value;
       document.querySelector('#grid').innerHTML = null;
@@ -55,14 +68,23 @@
         });
       }
 
-      if (
-        (rows === '' || rows === null) ||
-        (columns === '' || columns === null)
-      ) {
-        alert('provide input');
-      } else if (isNaN(rows) || isNaN(columns)) {
-        alert('provide numbers');
+      if (rows < 1 || rows > 50 || isNaN(rows)) {
+        document.querySelector('#row-span-warning').classList.remove('hidden');
       } else {
+        document.querySelector('#row-span-warning').classList.add('hidden');
+        buildrows = true;
+      }
+
+      if (columns < 1 || columns > 50 || isNaN(columns)) {
+        document
+          .querySelector('#column-span-warning')
+          .classList.remove('hidden');
+      } else {
+        document.querySelector('#column-span-warning').classList.add('hidden');
+        buildcells = true;
+      }
+
+      if (buildrows && buildcells) {
         for (let i = 0; i < rows; i++) {
           render('<div class="row"></div>', document.querySelector('#grid'));
           for (let j = 0; j < columns; j++) {
@@ -73,13 +95,15 @@
           }
         }
         document.querySelectorAll('#row-idx, #cell-idx').forEach(node => {
+          node.innerText = '';
           node.classList.remove('hidden');
+        });
+
+        document.querySelectorAll('.cell').forEach(node => {
+          node.addEventListener('click', selected);
         });
       }
 
-      document.querySelectorAll('.cell').forEach(node => {
-        node.addEventListener('click', selected);
-      });
       evt.preventDefault();
     };
 
